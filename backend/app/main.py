@@ -12,6 +12,7 @@ from app.api.product import router as product_router
 from app.api.stock import router as stock_router
 from app.api.warehouse import router as warehouse_router
 from app.api.location import router as location_router
+from fastapi.middleware.cors import CORSMiddleware
 
 
 Base.metadata.create_all(bind=engine)
@@ -23,6 +24,12 @@ app = FastAPI(
     version="1.0.0"
 )
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
 
 app.include_router(users_router)
 
