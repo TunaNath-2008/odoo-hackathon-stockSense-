@@ -1,75 +1,81 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import {
-  FaChartPie,
-  FaBoxOpen,
-  FaWarehouse,
-  FaMapMarkedAlt,
-} from "react-icons/fa";
+  LayoutDashboard,
+  Package,
+  Warehouse,
+  User,
+  LogOut,
+  PackagePlus,
+  Truck,
+  ArrowLeftRight,
+  History,
+} from "lucide-react";
+import { useInventory } from "../../context/InventoryContext";
 
-const menuItems = [
-  {
-    name: "Dashboard",
-    path: "/",
-    icon: <FaChartPie />,
-  },
-  {
-    name: "Products",
-    path: "/products",
-    icon: <FaBoxOpen />,
-  },
-  {
-    name: "Warehouses",
-    path: "/warehouses",
-    icon: <FaWarehouse />,
-  },
-  {
-    name: "Warehouse Map",
-    path: "/warehouse-map",
-    icon: <FaMapMarkedAlt />,
-  },
-];
+const linkClass = ({ isActive }) => "sidemenu__link" + (isActive ? " active" : "");
 
-const Sidebar = () => {
+export default function SideMenu() {
+  const { logout } = useInventory();
+  const navigate = useNavigate();
+
+  function handleLogout() {
+    logout();
+    navigate("/login");
+  }
+
   return (
-    <aside className="w-64 min-h-screen bg-slate-900 text-white flex flex-col shadow-xl">
-      {/* Logo */}
-      <div className="p-6 border-b border-slate-700">
-        <h1 className="text-3xl font-bold text-blue-400">
-          StockSense
-        </h1>
-        <p className="text-slate-400 text-sm mt-1">
-          Inventory Intelligence
-        </p>
+    <nav className="sidemenu" aria-label="Primary">
+      <div className="sidemenu__brand">
+        <span className="sidemenu__brand-mark" aria-hidden="true" />
+        <span>StockSense</span>
       </div>
 
-      {/* Menu */}
-      <nav className="flex-1 mt-6">
-        {menuItems.map((item) => (
-          <NavLink
-            key={item.name}
-            to={item.path}
-            className={({ isActive }) =>
-              `flex items-center gap-4 mx-3 my-2 px-4 py-3 rounded-xl transition-all duration-300 ${
-                isActive
-                  ? "bg-blue-600 text-white shadow-lg"
-                  : "hover:bg-slate-800 text-slate-300"
-              }`
-            }
-          >
-            <span className="text-xl">{item.icon}</span>
-            <span className="font-medium">{item.name}</span>
-          </NavLink>
-        ))}
-      </nav>
+      <div className="sidemenu__section-label">Operations</div>
+      <NavLink to="/dashboard" className={linkClass}>
+        <LayoutDashboard size={16} strokeWidth={1.75} />
+        <span>Dashboard</span>
+      </NavLink>
+      <NavLink to="/products" className={linkClass}>
+        <Package size={16} strokeWidth={1.75} />
+        <span>Products</span>
+      </NavLink>
+      <NavLink to="/receipts" className={linkClass}>
+        <PackagePlus size={16} strokeWidth={1.75} />
+        <span>Receipts</span>
+      </NavLink>
+      <NavLink to="/deliveries" className={linkClass}>
+        <Truck size={16} strokeWidth={1.75} />
+        <span>Delivery Orders</span>
+      </NavLink>
+      <NavLink to="/adjustments" className={linkClass}>
+        <ArrowLeftRight size={16} strokeWidth={1.75} />
+        <span>Adjustments</span>
+      </NavLink>
+      <NavLink to="/move-history" className={linkClass}>
+        <History size={16} strokeWidth={1.75} />
+        <span>Move History</span>
+      </NavLink>
 
-      {/* Footer */}
-      <div className="p-4 border-t border-slate-700">
-        <p className="text-xs text-slate-400">
-          StockSense v1.0
-        </p>
+      <div className="sidemenu__section-label">Settings</div>
+      <NavLink to="/warehouses" className={linkClass}>
+        <Warehouse size={16} strokeWidth={1.75} />
+        <span>Warehouses</span>
+      </NavLink>
+
+      <div className="sidemenu__footer">
+        <NavLink to="/profile" className={linkClass} style={{ width: "100%" }}>
+          <User size={16} strokeWidth={1.75} />
+          <span>My Profile</span>
+        </NavLink>
+        <button
+          className="sidemenu__link"
+          style={{ width: "100%", border: "none", background: "none" }}
+          onClick={handleLogout}
+        >
+          <LogOut size={16} strokeWidth={1.75} />
+          <span>Logout</span>
+        </button>
       </div>
-    </aside>
+    </nav>
   );
-};
-
-export default Sidebar;
+}

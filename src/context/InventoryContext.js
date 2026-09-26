@@ -37,32 +37,72 @@ export function InventoryProvider({ children }) {
     ]);
   }
 
-  function validateOperation(operationId) {
-    setOperations((prev) =>
-      prev.map((op) => (op.id === operationId ? { ...op, status: "Done" } : op))
-    );
+  function nextOperationId() {
+    const numbers = operations
+      .map((o) => Number(String(o.id).replace(/\D/g, "")))
+      .filter((n) => !Number.isNaN(n));
+    const next = (numbers.length ? Math.max(...numbers) : 1000) + 1;
+    return `op-${next}`;
+  }
 
-    setOperations((prevOps) => {
-      const op = prevOps.find((o) => o.id === operationId);
-      if (op && op.status === "Done") {
-        setProducts((prevProducts) =>
-          prevProducts.map((product) => {
-            const line = op.lines.find((l) => l.productId === product.id);
-            if (!line) return product;
-            const direction = op.type === "Delivery" ? -1 : 1;
-            const delta = op.type === "Adjustment" ? line.qty : direction * line.qty;
-            return {
-              ...product,
-              stockByLocation: {
-                ...product.stockByLocation,
-                [op.warehouse]: (product.stockByLocation[op.warehouse] || 0) + delta,
-              },
-            };
-          })
-        );
+  function addOperation(operation) {
+    const id = nextOperationId();
+    const record = {
+      id,
+      status: "Waiting",
+      date: new Date().toISOString().slice(0, 10),
+      ...operation,
+    };
+    setOperations((prev) => [record, ...prev]);
+    return id;
+  }
+
+  function cancelOperation(operationId) {
+    setOperations((prev) =>
+      prev.map((op) =>
+        op.id === operationId && op.status !== "Done" ? { ...op, status: "Canceled" } : op
+      )
+    );
+  }
+
+  function applyStockDelta(warehouseId, productId, delta) {
+    if (!delta) return;
+    setProducts((prevProducts) =>
+      prevProducts.map((product) => {
+        if (product.id !== productId) return product;
+        return {
+          ...product,
+          stockByLocation: {
+            ...product.stockByLocation,
+            [warehouseId]: (product.stockByLocation[warehouseId] || 0) + delta,
+          },
+        };
+      })
+    );
+  }
+
+  function validateOperation(operationId) {
+    const op = operations.find((o) => o.id === operationId);
+    if (!op || op.status === "Done" || op.status === "Canceled") return;
+
+    op.lines.forEach((line) => {
+      if (op.type === "Internal" && op.fromWarehouse && op.toWarehouse) {
+        applyStockDelta(op.fromWarehouse, line.productId, -Math.abs(line.qty));
+        applyStockDelta(op.toWarehouse, line.productId, Math.abs(line.qty));
+      } else {
+        const direction = op.type === "Delivery" ? -1 : 1;
+        const delta = op.type === "Adjustment" ? line.qty : direction * line.qty;
+        applyStockDelta(op.warehouse, line.productId, delta);
       }
-      return prevOps;
     });
+
+    setOperations((prev) =>
+      prev.map((o) => (o.id === operationId ? { ...o, status: "Done" } : o))
+    );
+  }
+
+  function updateProfile(updates) {
+    setCurrentUser((prev) => (prev ? { ...prev, ...updates } : prev));
   }
 
   const value = useMemo(
@@ -74,7 +114,10 @@ export function InventoryProvider({ children }) {
       products,
       addProduct,
       operations,
+      addOperation,
+      cancelOperation,
       validateOperation,
+      updateProfile,
       warehouses,
       categories,
       documentTypes,

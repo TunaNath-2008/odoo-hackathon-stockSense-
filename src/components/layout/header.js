@@ -1,35 +1,46 @@
-import { FaBell, FaSearch, FaUserCircle } from "react-icons/fa";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Bell, LogOut } from "lucide-react";
+import { useInventory } from "../../context/InventoryContext";
 
-const Navbar = () => {
+const TITLES = {
+  dashboard: "Dashboard",
+  products: "Products",
+  warehouses: "Warehouses",
+  receipts: "Receipts",
+  deliveries: "Delivery Orders",
+  adjustments: "Adjustments",
+  "move-history": "Move History",
+  profile: "My Profile",
+};
+
+export default function Header() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { currentUser, logout } = useInventory();
+
+  const segment = location.pathname.split("/").filter(Boolean)[0] || "dashboard";
+  const title = TITLES[segment] || "StockSense";
+
+  function handleLogout() {
+    logout();
+    navigate("/login");
+  }
+
   return (
-    <header className="h-20 bg-white shadow-sm flex items-center justify-between px-8">
-      <div className="relative w-96">
-        <FaSearch className="absolute left-4 top-4 text-gray-400" />
-
-        <input
-          type="text"
-          placeholder="Search products..."
-          className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-      </div>
-
-      <div className="flex items-center gap-6">
-        <button className="text-2xl text-gray-600 hover:text-blue-600">
-          <FaBell />
+    <header className="header">
+      <div className="header__title">{title}</div>
+      <div className="header__meta">
+        <Bell size={17} strokeWidth={1.75} aria-hidden="true" />
+        <span>{currentUser?.name || "Guest"}</span>
+        <button
+          className="ui-btn ghost"
+          onClick={handleLogout}
+          aria-label="Log out"
+          title="Log out"
+        >
+          <LogOut size={15} strokeWidth={1.75} />
         </button>
-
-        <div className="flex items-center gap-3">
-          <FaUserCircle className="text-4xl text-blue-600" />
-          <div>
-            <h2 className="font-semibold">Admin</h2>
-            <p className="text-sm text-gray-500">
-              Inventory Manager
-            </p>
-          </div>
-        </div>
       </div>
     </header>
   );
-};
-
-export default Navbar;
+}
