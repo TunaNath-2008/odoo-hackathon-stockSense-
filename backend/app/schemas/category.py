@@ -1,22 +1,15 @@
-from sqlalchemy import ForeignKey, String
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-
-from app.core.database import Base
+from pydantic import BaseModel
 
 
-class Category(Base):
-    __tablename__ = "categories"
+class CategoryCreate(BaseModel):
+    name: str
+    department_id: int
 
-    id: Mapped[int] = mapped_column(primary_key=True)
 
-    name: Mapped[str] = mapped_column(
-        String(150),
-        nullable=False
-    )
+class CategoryResponse(BaseModel):
+    id: int
+    name: str
+    department_id: int
 
-    department_id: Mapped[int] = mapped_column(
-        ForeignKey("departments.id"),
-        nullable=False
-    )
-
-    department = relationship("Department")
+    class Config:
+        from_attributes = True

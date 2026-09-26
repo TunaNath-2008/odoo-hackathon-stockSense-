@@ -1,21 +1,19 @@
-from sqlalchemy import String
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-
-from app.core.database import Base
+from pydantic import BaseModel
 
 
-class Business(Base):
-    __tablename__ = "businesses"
+class BusinessCreate(BaseModel):
+    name: str
+    email: str | None = None
+    phone: str | None = None
+    address: str | None = None
 
-    id: Mapped[int] = mapped_column(primary_key=True)
 
-    name: Mapped[str] = mapped_column(
-        String(150),
-        nullable=False
-    )
+class BusinessResponse(BaseModel):
+    id: int
+    name: str
+    email: str | None = None
+    phone: str | None = None
+    address: str | None = None
 
-    email: Mapped[str | None] = mapped_column(String(255))
-
-    phone: Mapped[str | None] = mapped_column(String(20))
-
-    address: Mapped[str | None] = mapped_column(String(250))
+    class Config:
+        from_attributes = True
