@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StockSense - Inventory Management</title>
+<style>
+  :root {
+    --ink: #1e1b2e;
+    --bg: #f6f5fb;
+    --card: #ffffff;
+    --muted: #6b7280;
+    --border: #e7e5f2;
+
+    --violet: #6d28d9;
+    --violet-light: #ede9fe;
+    --amber: #d97706;
+    --amber-light: #fef3c7;
+    --teal: #0d9488;
+    --teal-light: #ccfbf1;
+    --rose: #e11d48;
+    --rose-light: #ffe4e6;
+    --blue: #2563eb;
+    --blue-light: #dbeafe;
+    --green: #16a34a;
+    --green-light: #dcfce7;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, Roboto, Arial, sans-serif;
+    background: var(--bg);
+    margin: 0;
+    color: var(--ink);
+  }
+
+  header {
+    background: linear-gradient(120deg, #4c1d95 0%, #6d28d9 45%, #7c3aed 100%);
+    color: white;
+    padding: 22px 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  header::after {
+    content: "";
+    position: absolute;
+    right: -60px; top: -60px;
+    width: 220px; height: 220px;
+    background: radial-gradient(circle, rgba(251,191,36,0.35), transparent 70%);
+  }
+  header h1 {
+    margin: 0;
+    font-size: 24px;
+    letter-spacing: -0.02em;
+    position: relative;
+  }
+  header p {
+    margin: 4px 0 0;
+    opacity: 0.85;
+    font-size: 13px;
+    position: relative;
+  }
+
+  #api-url-bar {
+    background: #2e1065;
+    color: #d8cef2;
+    padding: 10px 28px;
+    font-size: 13px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  #api-url-bar input {
+    flex: 1;
+    max-width: 320px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #4c2c94;
+    background: #3b1878;
+    color: white;
+  }
+  #api-url-bar button {
+    padding: 6px 14px;
+    border-radius: 6px;
+    border: none;
+    background: var(--amber);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  #api-url-bar button:hover { background: #b45f04; }
+  #connStatus { font-weight: 600; }
+
+  nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    background: white;
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 5;
+  }
+  nav button {
+    padding: 9px 16px;
+    border: 1px solid var(--border);
+    background: white;
+    cursor: pointer;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    transition: all 0.15s ease;
+  }
+  nav button:hover { border-color: var(--violet); color: var(--violet); }
+  nav button.active {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: white;
+  }
+
+  main {
+    max-width: 960px;
+    margin: 24px auto;
+    padding: 0 20px 60px;
+  }
+
+  .panel { display: none; }
+  .panel.active { display: block; animation: fadein 0.2s ease; }
+  @keyframes fadein { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+  .card {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 22px;
+    box-shadow: 0 1px 2px rgba(30,27,46,0.04), 0 8px 24px rgba(30,27,46,0.06);
+    margin-bottom: 20px;
+    border-top: 4px solid var(--accent, var(--violet));
+  }
+
+  .card h2 {
+    margin: 0 0 14px;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .card h2 .dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--accent, var(--violet));
+    display: inline-block;
+  }
+
+  .refresh-btn {
+    margin-left: auto;
+    font-size: 12px;
+    padding: 5px 12px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    border-radius: 999px;
+    cursor: pointer;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .refresh-btn:hover { border-color: var(--accent, var(--violet)); color: var(--accent, var(--violet)); }
+
+  form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  form label {
+    display: flex;
+    flex-direction: column;
+    font-size: 12px;
+    color: var(--muted);
+    gap: 5px;
+    font-weight: 600;
+  }
+  input, select {
+    padding: 9px 10px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    background: var(--bg);
+    transition: border-color 0.15s;
+  }
+  input:focus, select:focus {
+    outline: none;
+    border-color: var(--accent, var(--violet));
+    background: white;
+  }
+  form button[type="submit"] {
+    grid-column: 1 / -1;
+    padding: 11px;
+    background: var(--accent, var(--violet));
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+  }
+  form button[type="submit"]:hover { filter: brightness(0.92); }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  th, td {
+    text-align: left;
+    padding: 10px 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  th {
+    color: var(--muted);
+    font-weight: 700;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  tbody tr:hover { background: var(--bg); }
+
+  .msg {
+    font-size: 13px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    margin-bottom: 14px;
+    display: none;
+    font-weight: 600;
+  }
+  .msg.ok { background: var(--green-light); color: #166534; display: block; }
+  .msg.err { background: var(--rose-light); color: #9f1239; display: block; }
+
+  .stock-sub {
+    font-size: 14px;
+    margin: 22px 0 10px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .stock-sub .badge {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    color: white;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📦 StockSense</h1>
+  <p>Inventory Management, made simple</p>
+</header>
+<div id="api-url-bar">
+  Backend URL:
+  <input type="text" id="apiBase" value="http://127.0.0.1:8000">
+  <button onclick="saveApiBase()">Save</button>
+  <span id="connStatus"></span>
+</div>
+
+<nav id="nav"></nav>
+
+<main id="main"></main>
+
+<script>
+let API = localStorage.getItem("stocksense_api") || "http://127.0.0.1:8000";
+document.getElementById("apiBase").value = API;
+
+function saveApiBase() {
+  API = document.getElementById("apiBase").value.replace(/\/$/, "");
+  localStorage.setItem("stocksense_api", API);
+  checkConnection();
+}
+
+async function checkConnection() {
+  const el = document.getElementById("connStatus");
+  el.textContent = "checking...";
+  try {
+    const res = await fetch(API + "/health");
+    if (res.ok) { el.textContent = "✅ connected"; } else { el.textContent = "⚠️ backend replied but not healthy"; }
+  } catch (e) {
+    el.textContent = "❌ cannot reach backend";
+  }
+}
+
+async function apiGet(path) {
+  const res = await fetch(API + path);
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+async function apiPost(path, body) {
+  const res = await fetch(API + path, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body)
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.detail || JSON.stringify(data));
+  return data;
+}
+
+function showMsg(panelId, text, isError) {
+  const el = document.getElementById(panelId + "-msg");
+  el.textContent = text;
+  el.className = "msg " + (isError ? "err" : "ok");
+  setTimeout(() => { el.style.display = "none"; }, 4000);
+}
+
+const sections = [
+  {
+    id: "businesses", label: "Businesses", icon: "🏢", color: "var(--violet)",
+    endpoint: "/businesses/",
+    fields: [
+      { name: "name", label: "Name", required: true },
+      { name: "email", label: "Email" },
+      { name: "phone", label: "Phone" },
+      { name: "address", label: "Address" }
+    ],
+    columns: ["id", "name", "email", "phone", "address"]
+  },
+  {
+    id: "departments", label: "Departments", icon: "🗂️", color: "var(--blue)",
+    endpoint: "/departments/",
+    fields: [
+      { name: "name", label: "Name", required: true },
+      { name: "business_id", label: "Business ID", type: "number", required: true }
+    ],
+    columns: ["id", "name", "business_id"]
+  },
+  {
+    id: "categories", label: "Categories", icon: "🏷️", color: "var(--teal)",
+    endpoint: "/categories/",
+    fields: [
+      { name: "name", label: "Name", required: true },
+      { name: "department_id", label: "Department ID", type: "number", required: true }
+    ],
+    columns: ["id", "name", "department_id"]
+  },
+  {
+    id: "products", label: "Products", icon: "📦", color: "var(--amber)",
+    endpoint: "/products/",
+    fields: [
+      { name: "name", label: "Name", required: true },
+      { name: "sku", label: "SKU", required: true },
+      { name: "unit", label: "Unit (pcs, kg)", required: true },
+      { name: "initial_stock", label: "Initial Stock", type: "number" },
+      { name: "reorder_level", label: "Reorder Level", type: "number" },
+      { name: "category_id", label: "Category ID", type: "number", required: true }
+    ],
+    columns: ["id", "name", "sku", "unit", "initial_stock", "reorder_level", "category_id"]
+  },
+  {
+    id: "warehouses", label: "Warehouses", icon: "🏭", color: "var(--rose)",
+    endpoint: "/warehouses/",
+    fields: [
+      { name: "name", label: "Name", required: true },
+      { name: "code", label: "Code", required: true },
+      { name: "address", label: "Address" },
+      { name: "business_id", label: "Business ID", type: "number", required: true }
+    ],
+    columns: ["id", "name", "code", "address", "business_id"]
+  },
+  {
+    id: "locations", label: "Locations", icon: "📍", color: "var(--green)",
+    endpoint: "/locations/",
+    fields: [
+      { name: "name", label: "Name", required: true },
+      { name: "location_type", label: "Type (shelf, room)", required: true },
+      { name: "capacity", label: "Capacity", type: "number" },
+      { name: "warehouse_id", label: "Warehouse ID", type: "number", required: true },
+      { name: "parent_id", label: "Parent Location ID", type: "number" }
+    ],
+    columns: ["id", "name", "location_type", "capacity", "warehouse_id", "parent_id"]
+  }
+];
+
+const stockActions = [
+  { key: "receive", label: "Receive Stock", color: "var(--green)", fields: ["product_id", "location_id", "quantity", "reference", "note"] },
+  { key: "deliver", label: "Deliver Stock", color: "var(--rose)", fields: ["product_id", "location_id", "quantity", "reference", "note"] },
+  { key: "transfer", label: "Transfer Stock", color: "var(--blue)", fields: ["product_id", "from_location_id", "to_location_id", "quantity", "reference", "note"] },
+  { key: "adjust", label: "Adjust Stock (count)", color: "var(--amber)", fields: ["product_id", "location_id", "counted_quantity", "reference", "note"] }
+];
+
+const nav = document.getElementById("nav");
+const main = document.getElementById("main");
+
+function addNavButton(id, label, icon) {
+  const btn = document.createElement("button");
+  btn.textContent = (icon ? icon + " " : "") + label;
+  btn.onclick = () => switchPanel(id);
+  btn.dataset.panel = id;
+  nav.appendChild(btn);
+}
+
+sections.forEach(s => addNavButton(s.id, s.label, s.icon));
+addNavButton("users", "Users", "👤");
+addNavButton("stock", "Stock Ops", "🔄");
+
+function switchPanel(id) {
+  document.querySelectorAll("nav button").forEach(b => b.classList.toggle("active", b.dataset.panel === id));
+  document.querySelectorAll(".panel").forEach(p => p.classList.toggle("active", p.id === "panel-" + id));
+}
+
+sections.forEach(section => {
+  const panel = document.createElement("div");
+  panel.className = "panel";
+  panel.id = "panel-" + section.id;
+
+  const formFields = section.fields.map(f =>
+    `<label>${f.label}${f.required ? " *" : ""}
+      <input name="${f.name}" type="${f.type || "text"}" ${f.required ? "required" : ""}>
+    </label>`
+  ).join("");
+
+  panel.innerHTML = `
+    <div class="card" style="--accent:${section.color}">
+      <h2><span class="dot"></span>${section.icon} ${section.label}
+        <button class="refresh-btn" onclick="loadList('${section.id}')">Refresh</button>
+      </h2>
+      <div class="msg" id="${section.id}-msg"></div>
+      <form id="form-${section.id}">
+        ${formFields}
+        <button type="submit">+ Add ${section.label.slice(0, -1)}</button>
+      </form>
+      <table>
+        <thead><tr>${section.columns.map(c => `<th>${c}</th>`).join("")}</tr></thead>
+        <tbody id="table-${section.id}"><tr><td colspan="${section.columns.length}">Loading...</td></tr></tbody>
+      </table>
+    </div>
+  `;
+  main.appendChild(panel);
+
+  document.getElementById(`form-${section.id}`).addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const body = {};
+    section.fields.forEach(f => {
+      let val = formData.get(f.name);
+      if (val === "") { val = null; }
+      else if (f.type === "number" && val !== null) { val = Number(val); }
+      body[f.name] = val;
+    });
+    try {
+      await apiPost(section.endpoint, body);
+      showMsg(section.id, "✅ Added successfully", false);
+      e.target.reset();
+      loadList(section.id);
+    } catch (err) {
+      showMsg(section.id, "❌ " + err.message, true);
+    }
+  });
+});
+
+async function loadList(sectionId) {
+  const section = sections.find(s => s.id === sectionId);
+  const tbody = document.getElementById("table-" + sectionId);
+  try {
+    const data = await apiGet(section.endpoint);
+    if (!data.length) {
+      tbody.innerHTML = `<tr><td colspan="${section.columns.length}">No records yet</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = data.map(row =>
+      `<tr>${section.columns.map(c => `<td>${row[c] ?? ""}</td>`).join("")}</tr>`
+    ).join("");
+  } catch (err) {
+    tbody.innerHTML = `<tr><td colspan="${section.columns.length}">Error loading data</td></tr>`;
+  }
+}
+
+const usersPanel = document.createElement("div");
+usersPanel.className = "panel";
+usersPanel.id = "panel-users";
+usersPanel.innerHTML = `
+  <div class="card" style="--accent:var(--blue)">
+    <h2><span class="dot"></span>👤 Users
+      <button class="refresh-btn" onclick="loadUsers()">Refresh</button>
+    </h2>
+    <div class="msg" id="users-msg"></div>
+    <form id="form-users">
+      <label>Name *<input name="name" required></label>
+      <label>Email *<input name="email" type="email" required></label>
+      <label>Phone<input name="phone"></label>
+      <label>Password *<input name="password" type="password" required></label>
+      <label>Role
+        <select name="role">
+          <option value="worker">worker</option>
+          <option value="admin">admin</option>
+          <option value="manager">manager</option>
+        </select>
+      </label>
+      <button type="submit">+ Create User</button>
+    </form>
+    <table>
+      <thead><tr><th>id</th><th>name</th><th>email</th><th>phone</th><th>role</th><th>active</th></tr></thead>
+      <tbody id="table-users"><tr><td colspan="6">Loading...</td></tr></tbody>
+    </table>
+  </div>
+`;
+main.appendChild(usersPanel);
+
+document.addEventListener("submit", async (e) => {
+  if (e.target.id !== "form-users") return;
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  const body = Object.fromEntries(fd.entries());
+  try {
+    await apiPost("/users/", body);
+    showMsg("users", "✅ User created", false);
+    e.target.reset();
+    loadUsers();
+  } catch (err) {
+    showMsg("users", "❌ " + err.message, true);
+  }
+});
+
+async function loadUsers() {
+  const tbody = document.getElementById("table-users");
+  try {
+    const data = await apiGet("/users/");
+    if (!data.length) { tbody.innerHTML = `<tr><td colspan="6">No users yet</td></tr>`; return; }
+    tbody.innerHTML = data.map(u =>
+      `<tr><td>${u.id}</td><td>${u.name}</td><td>${u.email}</td><td>${u.phone ?? ""}</td><td>${u.role}</td><td>${u.is_active}</td></tr>`
+    ).join("");
+  } catch (err) {
+    tbody.innerHTML = `<tr><td colspan="6">Error loading data</td></tr>`;
+  }
+}
+
+const stockPanel = document.createElement("div");
+stockPanel.className = "panel";
+stockPanel.id = "panel-stock";
+let stockHtml = `<div class="card" style="--accent:var(--amber)"><h2><span class="dot"></span>🔄 Stock Operations</h2><div class="msg" id="stock-msg"></div>`;
+stockActions.forEach(action => {
+  const fieldsHtml = action.fields.map(f =>
+    `<label>${f.replace(/_/g, " ")}<input name="${f}" ${f.includes("quantity") || f.includes("_id") ? 'type="number"' : ""} ${f === "reference" || f === "note" ? "" : "required"}></label>`
+  ).join("");
+  stockHtml += `
+    <div class="stock-sub"><span class="badge" style="background:${action.color}">${action.key}</span>${action.label}</div>
+    <form class="stock-form" data-action="${action.key}" style="--accent:${action.color}">
+      ${fieldsHtml}
+      <button type="submit">${action.label}</button>
+    </form>
+  `;
+});
+stockHtml += `</div>`;
+stockPanel.innerHTML = stockHtml;
+main.appendChild(stockPanel);
+
+document.addEventListener("submit", async (e) => {
+  if (!e.target.classList.contains("stock-form")) return;
+  e.preventDefault();
+  const action = e.target.dataset.action;
+  const fd = new FormData(e.target);
+  const params = new URLSearchParams();
+  for (const [key, val] of fd.entries()) {
+    if (val !== "") params.append(key, val);
+  }
+  try {
+    const res = await fetch(`${API}/stock/${action}?${params.toString()}`, { method: "POST" });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || JSON.stringify(data));
+    showMsg("stock", "✅ " + data.message, false);
+    e.target.reset();
+  } catch (err) {
+    showMsg("stock", "❌ " + err.message, true);
+  }
+});
+
+switchPanel("businesses");
+sections.forEach(s => loadList(s.id));
+loadUsers();
+checkConnection();
+</script>
+</body>
+</html>
