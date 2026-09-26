@@ -1,11 +1,9 @@
 from fastapi import FastAPI
 
-from backend.app.core.database import Base, engine
-from backend.app.models import User
-
+from app.core.database import Base, engine
+from app.models import User
 
 Base.metadata.create_all(bind=engine)
-
 
 app = FastAPI(
     title="StockSense API",
