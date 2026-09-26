@@ -1,23 +1,43 @@
-from pydantic import BaseModel
+from sqlalchemy import Float, ForeignKey, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from app.core.database import Base
 
 
-class ProductCreate(BaseModel):
-    name: str
-    sku: str
-    unit: str
-    initial_stock: float = 0
-    reorder_level: float = 0
-    category_id: int
+class Product(Base):
+    __tablename__ = "products"
 
+    id: Mapped[int] = mapped_column(primary_key=True)
 
-class ProductResponse(BaseModel):
-    id: int
-    name: str
-    sku: str
-    unit: str
-    initial_stock: float
-    reorder_level: float
-    category_id: int
+    name: Mapped[str] = mapped_column(
+        String(150),
+        nullable=False
+    )
 
-    class Config:
-        from_attributes = True
+    sku: Mapped[str] = mapped_column(
+        String(100),
+        unique=True,
+        nullable=False
+    )
+
+    unit: Mapped[str] = mapped_column(
+        String(50),
+        nullable=False
+    )
+
+    initial_stock: Mapped[float] = mapped_column(
+        Float,
+        default=0
+    )
+
+    reorder_level: Mapped[float] = mapped_column(
+        Float,
+        default=0
+    )
+
+    category_id: Mapped[int] = mapped_column(
+        ForeignKey("categories.id"),
+        nullable=False
+    )
+
+    category = relationship("Category")
