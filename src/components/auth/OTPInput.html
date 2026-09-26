@@ -1,0 +1,1171 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>stockSense — Reset Password</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+
+:root{
+  --navy-950:#0d1220;
+  --navy-900:#131a2e;
+  --navy-800:#1b2440;
+  --navy-700:#28335a;
+  --line:#33406b;
+  --paper:#f6f4ee;
+  --ink:#161a24;
+  --ink-soft:#5b6072;
+  --amber:#f2a93b;
+  --amber-dim:#c98a2e;
+  --danger:#e0654f;
+  --success:#5b8c5a;
+}
+
+*{
+  box-sizing:border-box;
+}
+
+html,body{
+  height:100%;
+}
+
+body{
+  margin:0;
+  font-family:'Inter',system-ui,sans-serif;
+  color:var(--ink);
+  background:var(--paper);
+  display:flex;
+  min-height:100vh;
+}
+
+
+/* ---------- LEFT BRAND PANEL ---------- */
+
+.brand{
+  position:relative;
+  flex:1.1;
+  background:var(--navy-950);
+  color:#e7e9f2;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  padding:48px 56px;
+  overflow:hidden;
+}
+
+.brand::before{
+  content:"";
+  position:absolute;
+  inset:0;
+
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      rgba(255,255,255,0.035) 0 1px,
+      transparent 1px 64px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgba(255,255,255,0.035) 0 1px,
+      transparent 1px 64px
+    );
+
+  pointer-events:none;
+}
+
+.brand-mark{
+  position:relative;
+  display:flex;
+  align-items:center;
+  gap:10px;
+
+  font-family:'Space Grotesk',sans-serif;
+  font-weight:700;
+  font-size:20px;
+}
+
+.brand-mark .dot{
+  width:10px;
+  height:10px;
+  border-radius:2px;
+  background:var(--amber);
+  transform:rotate(45deg);
+}
+
+.brand-body{
+  position:relative;
+  max-width:420px;
+}
+
+.brand-body h1{
+  font-family:'Space Grotesk',sans-serif;
+  font-weight:600;
+  font-size:34px;
+  line-height:1.25;
+
+  margin:0 0 18px;
+}
+
+.brand-body p{
+  font-size:15px;
+  line-height:1.6;
+  color:#a8adc2;
+  margin:0;
+}
+
+.stack-vis{
+  position:relative;
+  display:flex;
+  gap:10px;
+  margin-top:36px;
+}
+
+.crate{
+  width:38px;
+  height:38px;
+  border-radius:6px;
+
+  border:1.5px solid var(--line);
+  background:var(--navy-800);
+}
+
+.crate.filled{
+  background:var(--amber);
+  border-color:var(--amber-dim);
+}
+
+.brand-foot{
+  position:relative;
+  font-size:12.5px;
+  color:#767c93;
+
+  display:flex;
+  justify-content:space-between;
+}
+
+
+/* ---------- RIGHT PANEL ---------- */
+
+.panel{
+  flex:1;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:40px;
+}
+
+.card{
+  width:100%;
+  max-width:360px;
+}
+
+.card h2{
+  font-family:'Space Grotesk',sans-serif;
+  font-weight:600;
+  font-size:24px;
+
+  margin:0 0 6px;
+}
+
+.card .sub{
+  font-size:14.5px;
+  color:var(--ink-soft);
+
+  margin:0 0 30px;
+}
+
+
+/* ---------- STEPS ---------- */
+
+.step{
+  display:none;
+}
+
+.step.active{
+  display:block;
+}
+
+
+/* ---------- INPUT ---------- */
+
+.field{
+  margin-bottom:18px;
+}
+
+.field label{
+  display:block;
+
+  font-size:13px;
+  font-weight:500;
+
+  margin-bottom:7px;
+}
+
+.field input{
+  width:100%;
+
+  padding:12px 14px;
+
+  font-size:14.5px;
+  font-family:inherit;
+
+  color:var(--ink);
+  background:#fff;
+
+  border:1.5px solid #dfdcd2;
+  border-radius:8px;
+
+  outline:none;
+
+  transition:border-color .15s ease,
+             box-shadow .15s ease;
+}
+
+.field input:focus{
+  border-color:var(--amber-dim);
+
+  box-shadow:
+    0 0 0 3px rgba(242,169,59,0.18);
+}
+
+.field input.invalid{
+  border-color:var(--danger);
+
+  box-shadow:
+    0 0 0 3px rgba(224,101,79,0.15);
+}
+
+.error-msg{
+  font-size:12.5px;
+  color:var(--danger);
+
+  margin-top:6px;
+
+  min-height:16px;
+}
+
+
+/* ---------- OTP ---------- */
+
+.otp-container{
+  display:flex;
+  gap:8px;
+
+  margin-top:8px;
+}
+
+.otp-container input{
+  width:100%;
+  height:48px;
+
+  text-align:center;
+
+  font-family:'Space Grotesk',sans-serif;
+  font-size:20px;
+  font-weight:600;
+
+  border:1.5px solid #dfdcd2;
+  border-radius:8px;
+
+  background:#fff;
+
+  outline:none;
+}
+
+.otp-container input:focus{
+  border-color:var(--amber-dim);
+
+  box-shadow:
+    0 0 0 3px rgba(242,169,59,0.18);
+}
+
+.otp-container input.invalid{
+  border-color:var(--danger);
+}
+
+
+/* ---------- BUTTON ---------- */
+
+button.submit{
+  width:100%;
+
+  padding:13px;
+
+  font-family:'Space Grotesk',sans-serif;
+  font-size:15px;
+  font-weight:600;
+
+  color:var(--navy-950);
+  background:var(--amber);
+
+  border:none;
+  border-radius:8px;
+
+  cursor:pointer;
+
+  transition:
+    transform .1s ease,
+    background .15s ease;
+}
+
+button.submit:hover{
+  background:#e69a25;
+}
+
+button.submit:active{
+  transform:scale(.99);
+}
+
+button.submit:disabled{
+  opacity:.6;
+  cursor:progress;
+}
+
+
+/* ---------- RESEND ---------- */
+
+.resend{
+  text-align:center;
+
+  margin-top:16px;
+
+  font-size:13px;
+  color:var(--ink-soft);
+}
+
+.resend button{
+  background:none;
+  border:none;
+
+  color:var(--amber-dim);
+
+  font-family:inherit;
+  font-size:13px;
+  font-weight:600;
+
+  cursor:pointer;
+
+  padding:0;
+}
+
+.resend button:disabled{
+  color:#aaa;
+  cursor:not-allowed;
+}
+
+
+/* ---------- SUCCESS ---------- */
+
+.success{
+  display:none;
+
+  font-size:13px;
+
+  padding:10px 12px;
+
+  margin-bottom:18px;
+
+  border-radius:7px;
+
+  background:#edf5ec;
+  color:#477144;
+
+  border:1px solid #c9dec6;
+}
+
+.success.show{
+  display:block;
+}
+
+
+/* ---------- BACK LINK ---------- */
+
+.back{
+  text-align:center;
+
+  margin-top:24px;
+
+  font-size:13.5px;
+
+  color:var(--ink-soft);
+}
+
+.back a{
+  color:var(--ink);
+
+  font-weight:600;
+
+  text-decoration:none;
+}
+
+.back a:hover{
+  text-decoration:underline;
+}
+
+
+/* ---------- RESPONSIVE ---------- */
+
+@media (max-width:860px){
+
+  .brand{
+    display:none;
+  }
+
+  .panel{
+    padding:28px;
+  }
+
+}
+
+</style>
+</head>
+
+
+<body>
+
+
+<!-- LEFT BRAND PANEL -->
+
+<aside class="brand">
+
+  <div class="brand-mark">
+    <span class="dot"></span>
+    stockSense
+  </div>
+
+
+  <div class="brand-body">
+
+    <h1>
+      Keep your inventory moving.
+    </h1>
+
+    <p>
+      Reset your account securely and get back to
+      managing your stock, orders, and warehouse
+      visibility.
+    </p>
+
+
+    <div class="stack-vis" aria-hidden="true">
+
+      <div class="crate filled"></div>
+      <div class="crate filled"></div>
+      <div class="crate"></div>
+      <div class="crate filled"></div>
+      <div class="crate"></div>
+
+    </div>
+
+  </div>
+
+
+  <div class="brand-foot">
+
+    <span>stockSense</span>
+
+    <span>Inventory, simplified</span>
+
+  </div>
+
+</aside>
+
+
+
+<!-- RIGHT PANEL -->
+
+<main class="panel">
+
+
+<form class="card" id="resetForm" novalidate>
+
+
+<!-- ================= STEP 1 ================= -->
+
+<div class="step active" id="step1">
+
+  <h2>Forgot your password?</h2>
+
+  <p class="sub">
+    Enter your email and we'll send you a verification code.
+  </p>
+
+
+  <div class="field">
+
+    <label for="email">
+      Email
+    </label>
+
+    <input
+      type="email"
+      id="email"
+      placeholder="you@company.com"
+      autocomplete="email"
+    >
+
+    <div
+      class="error-msg"
+      id="emailError">
+    </div>
+
+  </div>
+
+
+  <button
+    type="button"
+    class="submit"
+    id="sendOtpBtn">
+
+    Send verification code
+
+  </button>
+
+
+  <div class="back">
+
+    Remember your password?
+
+    <a href="login.html">
+      Back to sign in
+    </a>
+
+  </div>
+
+</div>
+
+
+
+<!-- ================= STEP 2 ================= -->
+
+<div class="step" id="step2">
+
+  <h2>Verify your email</h2>
+
+  <p class="sub">
+    Enter the 6-digit code sent to your email.
+  </p>
+
+
+  <div
+    class="success"
+    id="successMessage">
+
+    Verification code sent successfully.
+
+  </div>
+
+
+  <label
+    style="font-size:13px;font-weight:500;">
+
+    Verification code
+
+  </label>
+
+
+  <div class="otp-container">
+
+    <input maxlength="1" inputmode="numeric" class="otp">
+    <input maxlength="1" inputmode="numeric" class="otp">
+    <input maxlength="1" inputmode="numeric" class="otp">
+    <input maxlength="1" inputmode="numeric" class="otp">
+    <input maxlength="1" inputmode="numeric" class="otp">
+    <input maxlength="1" inputmode="numeric" class="otp">
+
+  </div>
+
+
+  <div
+    class="error-msg"
+    id="otpError">
+  </div>
+
+
+  <button
+    type="button"
+    class="submit"
+    id="verifyBtn">
+
+    Verify code
+
+  </button>
+
+
+  <div class="resend">
+
+    Didn't receive the code?
+
+    <button
+      type="button"
+      id="resendBtn"
+      disabled>
+
+      Resend code
+
+    </button>
+
+    <span id="timer"></span>
+
+  </div>
+
+
+  <div class="back">
+
+    <a href="login.html">
+      Back to sign in
+    </a>
+
+  </div>
+
+</div>
+
+
+
+<!-- ================= STEP 3 ================= -->
+
+<div class="step" id="step3">
+
+  <h2>Create new password</h2>
+
+  <p class="sub">
+    Choose a new password for your stockSense account.
+  </p>
+
+
+  <div class="field">
+
+    <label for="newPassword">
+      New password
+    </label>
+
+    <input
+      type="password"
+      id="newPassword"
+      placeholder="Enter new password"
+      autocomplete="new-password"
+    >
+
+    <div
+      class="error-msg"
+      id="newPasswordError">
+    </div>
+
+  </div>
+
+
+  <div class="field">
+
+    <label for="confirmPassword">
+      Confirm password
+    </label>
+
+    <input
+      type="password"
+      id="confirmPassword"
+      placeholder="Re-enter your password"
+      autocomplete="new-password"
+    >
+
+    <div
+      class="error-msg"
+      id="confirmError">
+    </div>
+
+  </div>
+
+
+  <button
+    type="button"
+    class="submit"
+    id="resetBtn">
+
+    Reset password
+
+  </button>
+
+</div>
+
+
+
+<!-- ================= STEP 4 ================= -->
+
+<div class="step" id="step4">
+
+  <h2>Password updated</h2>
+
+  <p class="sub">
+    Your password has been successfully changed.
+  </p>
+
+
+  <button
+    type="button"
+    class="submit"
+    onclick="window.location.href='login.html'">
+
+    Back to sign in
+
+  </button>
+
+</div>
+
+
+</form>
+
+</main>
+
+
+
+<script>
+
+
+/* ---------- ELEMENTS ---------- */
+
+const step1 = document.getElementById('step1');
+const step2 = document.getElementById('step2');
+const step3 = document.getElementById('step3');
+const step4 = document.getElementById('step4');
+
+const emailInput =
+  document.getElementById('email');
+
+const emailError =
+  document.getElementById('emailError');
+
+const sendOtpBtn =
+  document.getElementById('sendOtpBtn');
+
+const verifyBtn =
+  document.getElementById('verifyBtn');
+
+const otpInputs =
+  document.querySelectorAll('.otp');
+
+const otpError =
+  document.getElementById('otpError');
+
+const resendBtn =
+  document.getElementById('resendBtn');
+
+const timer =
+  document.getElementById('timer');
+
+const successMessage =
+  document.getElementById('successMessage');
+
+const newPassword =
+  document.getElementById('newPassword');
+
+const confirmPassword =
+  document.getElementById('confirmPassword');
+
+const newPasswordError =
+  document.getElementById('newPasswordError');
+
+const confirmError =
+  document.getElementById('confirmError');
+
+const resetBtn =
+  document.getElementById('resetBtn');
+
+
+
+/* ---------- EMAIL VALIDATION ---------- */
+
+function validEmail(value){
+
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+
+}
+
+
+
+/* ---------- SHOW STEP ---------- */
+
+function showStep(step){
+
+  document
+    .querySelectorAll('.step')
+    .forEach(element => {
+
+      element.classList.remove('active');
+
+    });
+
+  step.classList.add('active');
+
+}
+
+
+
+/* ---------- SEND OTP ---------- */
+
+sendOtpBtn.addEventListener('click', async () => {
+
+
+  emailError.textContent = '';
+
+  emailInput.classList.remove('invalid');
+
+
+  if(!validEmail(emailInput.value.trim())){
+
+    emailInput.classList.add('invalid');
+
+    emailError.textContent =
+      'Enter a valid email address.';
+
+    return;
+
+  }
+
+
+  sendOtpBtn.disabled = true;
+
+  sendOtpBtn.textContent =
+    'Sending code...';
+
+
+  /* Demo delay */
+
+  await new Promise(resolve =>
+    setTimeout(resolve,800)
+  );
+
+
+  /*
+    REAL BACKEND:
+
+    await fetch('/api/auth/send-otp',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json'
+      },
+      body:JSON.stringify({
+        email:emailInput.value.trim()
+      })
+    });
+  */
+
+
+  showStep(step2);
+
+  successMessage.classList.add('show');
+
+  otpInputs[0].focus();
+
+  startTimer();
+
+
+  sendOtpBtn.disabled = false;
+
+  sendOtpBtn.textContent =
+    'Send verification code';
+
+});
+
+
+
+/* ---------- OTP INPUT ---------- */
+
+otpInputs.forEach((input,index) => {
+
+
+  input.addEventListener('input', () => {
+
+
+    input.value =
+      input.value.replace(/\D/g,'');
+
+
+    if(input.value && index < otpInputs.length - 1){
+
+      otpInputs[index + 1].focus();
+
+    }
+
+  });
+
+
+  input.addEventListener('keydown', (e) => {
+
+
+    if(
+      e.key === 'Backspace' &&
+      !input.value &&
+      index > 0
+    ){
+
+      otpInputs[index - 1].focus();
+
+    }
+
+  });
+
+});
+
+
+
+/* ---------- VERIFY OTP ---------- */
+
+verifyBtn.addEventListener('click', async () => {
+
+
+  otpError.textContent = '';
+
+  otpInputs.forEach(input =>
+    input.classList.remove('invalid')
+  );
+
+
+  const otp =
+    Array.from(otpInputs)
+      .map(input => input.value)
+      .join('');
+
+
+  if(otp.length !== 6){
+
+    otpInputs.forEach(input =>
+      input.classList.add('invalid')
+    );
+
+    otpError.textContent =
+      'Enter the complete 6-digit code.';
+
+    return;
+
+  }
+
+
+  verifyBtn.disabled = true;
+
+  verifyBtn.textContent =
+    'Verifying...';
+
+
+  /* Demo delay */
+
+  await new Promise(resolve =>
+    setTimeout(resolve,700)
+  );
+
+
+  /*
+    DEMO OTP
+
+    For testing, use:
+
+    123456
+
+    In a real application,
+    verify the OTP on your backend.
+  */
+
+
+  if(otp !== '123456'){
+
+    otpInputs.forEach(input =>
+      input.classList.add('invalid')
+    );
+
+    otpError.textContent =
+      'Invalid verification code.';
+
+    verifyBtn.disabled = false;
+
+    verifyBtn.textContent =
+      'Verify code';
+
+    return;
+
+  }
+
+
+  showStep(step3);
+
+
+  verifyBtn.disabled = false;
+
+  verifyBtn.textContent =
+    'Verify code';
+
+});
+
+
+
+/* ---------- TIMER ---------- */
+
+let countdown;
+
+
+function startTimer(){
+
+  let seconds = 30;
+
+  resendBtn.disabled = true;
+
+  timer.textContent =
+    ` (${seconds}s)`;
+
+
+  clearInterval(countdown);
+
+
+  countdown = setInterval(() => {
+
+
+    seconds--;
+
+
+    timer.textContent =
+      ` (${seconds}s)`;
+
+
+    if(seconds <= 0){
+
+      clearInterval(countdown);
+
+      timer.textContent = '';
+
+      resendBtn.disabled = false;
+
+    }
+
+  },1000);
+
+}
+
+
+
+/* ---------- RESEND OTP ---------- */
+
+resendBtn.addEventListener('click', () => {
+
+
+  successMessage.textContent =
+    'A new verification code has been sent.';
+
+
+  successMessage.classList.add('show');
+
+
+  otpInputs.forEach(input =>
+    input.value = ''
+  );
+
+
+  otpInputs[0].focus();
+
+
+  startTimer();
+
+
+  /*
+    REAL BACKEND:
+
+    Send a new OTP to the user's email here.
+  */
+
+});
+
+
+
+/* ---------- RESET PASSWORD ---------- */
+
+resetBtn.addEventListener('click', async () => {
+
+
+  newPasswordError.textContent = '';
+
+  confirmError.textContent = '';
+
+  newPassword.classList.remove('invalid');
+
+  confirmPassword.classList.remove('invalid');
+
+
+  if(newPassword.value.length < 8){
+
+    newPassword.classList.add('invalid');
+
+    newPasswordError.textContent =
+      'Password must be at least 8 characters.';
+
+    return;
+
+  }
+
+
+  if(newPassword.value !== confirmPassword.value){
+
+    confirmPassword.classList.add('invalid');
+
+    confirmError.textContent =
+      'Passwords do not match.';
+
+    return;
+
+  }
+
+
+  resetBtn.disabled = true;
+
+  resetBtn.textContent =
+    'Updating password...';
+
+
+  /* Demo delay */
+
+  await new Promise(resolve =>
+    setTimeout(resolve,800)
+  );
+
+
+  /*
+    REAL BACKEND:
+
+    Send the verified OTP and
+    new password to your server.
+
+    Example:
+
+    await fetch('/api/auth/reset-password',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json'
+      },
+      body:JSON.stringify({
+        email:emailInput.value.trim(),
+        otp:otp,
+        password:newPassword.value
+      })
+    });
+  */
+
+
+  showStep(step4);
+
+
+  resetBtn.disabled = false;
+
+  resetBtn.textContent =
+    'Reset password';
+
+});
+
+
+</script>
+
+</body>
+</html>
+```

@@ -6,24 +6,285 @@
 <title>stockSense — Sign in</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="auth.css">
+<style>
+  :root{
+    --navy-950:#0d1220;
+    --navy-900:#131a2e;
+    --navy-800:#1b2440;
+    --navy-700:#28335a;
+    --line:#33406b;
+    --paper:#f6f4ee;
+    --ink:#161a24;
+    --ink-soft:#5b6072;
+    --amber:#f2a93b;
+    --amber-dim:#c98a2e;
+    --danger:#e0654f;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    font-family:'Inter',system-ui,sans-serif;
+    color:var(--ink);
+    background:var(--paper);
+    display:flex;
+    min-height:100vh;
+  }
+
+  /* ---------- Left: brand panel ---------- */
+  .brand{
+    position:relative;
+    flex:1.1;
+    background:var(--navy-950);
+    color:#e7e9f2;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    padding:48px 56px;
+    overflow:hidden;
+  }
+  .brand::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background-image:
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 64px),
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 64px);
+    pointer-events:none;
+  }
+  .brand-mark{
+    position:relative;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:700;
+    font-size:20px;
+    letter-spacing:-0.01em;
+  }
+  .brand-mark .dot{
+    width:10px;height:10px;border-radius:2px;
+    background:var(--amber);
+    transform:rotate(45deg);
+  }
+  .brand-body{position:relative; max-width:420px;}
+  .brand-body h1{
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:600;
+    font-size:34px;
+    line-height:1.25;
+    letter-spacing:-0.01em;
+    margin:0 0 18px;
+  }
+  .brand-body p{
+    font-size:15px;
+    line-height:1.6;
+    color:#a8adc2;
+    margin:0;
+  }
+  .stack-vis{
+    position:relative;
+    display:flex;
+    gap:10px;
+    margin-top:36px;
+  }
+  .crate{
+    width:38px;height:38px;border-radius:6px;
+    border:1.5px solid var(--line);
+    background:var(--navy-800);
+  }
+  .crate.filled{ background:var(--amber); border-color:var(--amber-dim); }
+  .brand-foot{
+    position:relative;
+    font-size:12.5px;
+    color:#767c93;
+    display:flex;
+    justify-content:space-between;
+  }
+
+  /* ---------- Right: form panel ---------- */
+  .panel{
+    flex:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:40px;
+  }
+  .card{
+    width:100%;
+    max-width:360px;
+  }
+  .card h2{
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:600;
+    font-size:24px;
+    margin:0 0 6px;
+    letter-spacing:-0.01em;
+  }
+  .card .sub{
+    font-size:14.5px;
+    color:var(--ink-soft);
+    margin:0 0 32px;
+  }
+  .field{ margin-bottom:18px; }
+  .field label{
+    display:block;
+    font-size:13px;
+    font-weight:500;
+    color:var(--ink);
+    margin-bottom:7px;
+  }
+  .input-wrap{
+    position:relative;
+    display:flex;
+    align-items:center;
+  }
+  .field input{
+    width:100%;
+    padding:12px 14px;
+    font-size:14.5px;
+    font-family:inherit;
+    color:var(--ink);
+    background:#fff;
+    border:1.5px solid #dfdcd2;
+    border-radius:8px;
+    outline:none;
+    transition:border-color .15s ease, box-shadow .15s ease;
+  }
+  .field input::placeholder{ color:#a9a9a0; }
+  .field input:focus{
+    border-color:var(--amber-dim);
+    box-shadow:0 0 0 3px rgba(242,169,59,0.18);
+  }
+  .field input.invalid{
+    border-color:var(--danger);
+    box-shadow:0 0 0 3px rgba(224,101,79,0.15);
+  }
+  .toggle-vis{
+    position:absolute;
+    right:10px;
+    background:none;
+    border:none;
+    cursor:pointer;
+    color:var(--ink-soft);
+    font-size:12.5px;
+    font-weight:500;
+    padding:4px 6px;
+  }
+  .toggle-vis:hover{ color:var(--ink); }
+  .error-msg{
+    font-size:12.5px;
+    color:var(--danger);
+    margin-top:6px;
+    min-height:16px;
+  }
+  .row-between{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin:2px 0 24px;
+    font-size:13.5px;
+  }
+  .remember{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    color:var(--ink-soft);
+    cursor:pointer;
+    user-select:none;
+  }
+  .remember input{ accent-color:var(--amber-dim); width:14px; height:14px; }
+  .row-between a{
+    color:var(--amber-dim);
+    text-decoration:none;
+    font-weight:500;
+  }
+  .row-between a:hover{ text-decoration:underline; }
+
+  button.submit{
+    width:100%;
+    padding:13px;
+    font-family:'Space Grotesk',sans-serif;
+    font-size:15px;
+    font-weight:600;
+    color:var(--navy-950);
+    background:var(--amber);
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    transition:transform .1s ease, background .15s ease;
+  }
+  button.submit:hover{ background:#e69a25; }
+  button.submit:active{ transform:scale(0.99); }
+  button.submit:disabled{ opacity:.6; cursor:progress; }
+
+  .divider{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin:26px 0;
+    color:#b6b3a8;
+    font-size:12.5px;
+  }
+  .divider::before,.divider::after{
+    content:"";
+    flex:1;
+    height:1px;
+    background:#e5e2d8;
+  }
+
+  .foot-note{
+    text-align:center;
+    font-size:13.5px;
+    color:var(--ink-soft);
+  }
+  .foot-note a{ color:var(--ink); font-weight:600; text-decoration:none; }
+  .foot-note a:hover{ text-decoration:underline; }
+
+  .banner{
+    display:none;
+    font-size:13px;
+    padding:10px 12px;
+    border-radius:7px;
+    margin-bottom:18px;
+    background:#fdecea;
+    color:#9a3324;
+    border:1px solid #f3c9c2;
+  }
+  .banner.show{ display:block; }
+
+  @media (prefers-reduced-motion:no-preference){
+    button.submit{ transition:transform .1s ease, background .15s ease; }
+  }
+  @media (max-width:860px){
+    .brand{ display:none; }
+    .panel{ padding:28px; }
+  }
+</style>
 </head>
 <body>
 
-  <aside class="auth-brand">
-    <div class="auth-brand-mark"><span class="auth-dot"></span>stockSense</div>
-    <div class="auth-brand-body">
+  <aside class="brand">
+    <div class="brand-mark"><span class="dot"></span>stockSense</div>
+    <div class="brand-body">
       <h1>Know what's on&nbsp;the shelf before it runs out.</h1>
       <p>Real-time stock levels, reorder alerts, and warehouse visibility in one place. Sign in to pick up where you left off.</p>
+      <div class="stack-vis" aria-hidden="true">
+        <div class="crate filled"></div>
+        <div class="crate filled"></div>
+        <div class="crate"></div>
+        <div class="crate filled"></div>
+        <div class="crate"></div>
+      </div>
     </div>
-    <div class="auth-brand-foot">
+    <div class="brand-foot">
       <span>stockSense</span>
       <span>Inventory, simplified</span>
     </div>
   </aside>
 
-  <main class="auth-panel">
-    <form class="auth-card" id="loginForm" novalidate>
+  <main class="panel">
+    <form class="card" id="loginForm" novalidate>
       <h2>Sign in</h2>
       <p class="sub">Enter your credentials to access your warehouse dashboard.</p>
 
@@ -56,7 +317,10 @@
 
       <div class="divider">or</div>
 
-      <p class="foot-note">Don't have an account? <a href="SignupForm.html">Create one</a></p>
+     <p class="foot-note">
+     Don't have an account?
+      <a href="SignupForm.html">Create one</a>
+     </p>
     </form>
   </main>
 
@@ -80,13 +344,17 @@
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
   }
 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
+  function clearErrors(){
     emailInput.classList.remove('invalid');
     passInput.classList.remove('invalid');
     emailError.textContent = '';
     passError.textContent = '';
     banner.classList.remove('show');
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearErrors();
 
     let hasError = false;
     if (!validEmail(emailInput.value.trim())) {
@@ -105,9 +373,26 @@
     submitBtn.textContent = 'Signing in...';
 
     try {
-      // TODO: replace with your real auth call
+      // TODO: replace this block with your real auth call, e.g.:
+      // const res = await fetch('/api/auth/login', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({
+      //     email: emailInput.value.trim(),
+      //     password: passInput.value,
+      //     remember: document.getElementById('remember').checked
+      //   })
+      // });
+      // if (!res.ok) throw new Error('Invalid credentials');
+      // const data = await res.json();
+      // window.location.href = '/dashboard';
+
+      // Placeholder demo delay so the UI states are visible:
       await new Promise(r => setTimeout(r, 900));
-      console.log('Login submitted:', { email: emailInput.value.trim() });
+      console.log('Login submitted:', {
+        email: emailInput.value.trim(),
+        remember: document.getElementById('remember').checked
+      });
       alert('Wire this up to your backend — form data logged to console.');
     } catch (err) {
       banner.classList.add('show');
@@ -115,6 +400,15 @@
       submitBtn.disabled = false;
       submitBtn.textContent = 'Sign in';
     }
+  });
+
+  document.getElementById('forgotLink').addEventListener('click', (e) => {
+    e.preventDefault();
+    alert('Hook this up to your password-reset flow.');
+  });
+  document.getElementById('signupLink').addEventListener('click', (e) => {
+    e.preventDefault();
+    alert('Hook this up to your sign-up route.');
   });
 </script>
 </body>
