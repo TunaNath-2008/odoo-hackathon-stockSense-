@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>stockSense — Sign in</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="auth.css">
+</head>
+<body>
+
+  <aside class="auth-brand">
+    <div class="auth-brand-mark"><span class="auth-dot"></span>stockSense</div>
+    <div class="auth-brand-body">
+      <h1>Know what's on&nbsp;the shelf before it runs out.</h1>
+      <p>Real-time stock levels, reorder alerts, and warehouse visibility in one place. Sign in to pick up where you left off.</p>
+    </div>
+    <div class="auth-brand-foot">
+      <span>stockSense</span>
+      <span>Inventory, simplified</span>
+    </div>
+  </aside>
+
+  <main class="auth-panel">
+    <form class="auth-card" id="loginForm" novalidate>
+      <h2>Sign in</h2>
+      <p class="sub">Enter your credentials to access your warehouse dashboard.</p>
+
+      <div class="banner" id="formBanner">Couldn't sign you in. Check your details and try again.</div>
+
+      <div class="field">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" placeholder="you@company.com" autocomplete="username" required>
+        <div class="error-msg" id="emailError"></div>
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <div class="input-wrap">
+          <input type="password" id="password" name="password" placeholder="Enter your password" autocomplete="current-password" required>
+          <button type="button" class="toggle-vis" id="togglePass">Show</button>
+        </div>
+        <div class="error-msg" id="passError"></div>
+      </div>
+
+      <div class="row-between">
+        <label class="remember">
+          <input type="checkbox" id="remember" name="remember">
+          Remember me
+        </label>
+        <a href="forgotpassword.html">Forgot password?</a>
+      </div>
+
+      <button type="submit" class="submit" id="submitBtn">Sign in</button>
+
+      <div class="divider">or</div>
+
+      <p class="foot-note">Don't have an account? <a href="SignupForm.html">Create one</a></p>
+    </form>
+  </main>
+
+<script>
+  const form = document.getElementById('loginForm');
+  const emailInput = document.getElementById('email');
+  const passInput = document.getElementById('password');
+  const emailError = document.getElementById('emailError');
+  const passError = document.getElementById('passError');
+  const banner = document.getElementById('formBanner');
+  const submitBtn = document.getElementById('submitBtn');
+  const toggleBtn = document.getElementById('togglePass');
+
+  toggleBtn.addEventListener('click', () => {
+    const isPassword = passInput.type === 'password';
+    passInput.type = isPassword ? 'text' : 'password';
+    toggleBtn.textContent = isPassword ? 'Hide' : 'Show';
+  });
+
+  function validEmail(value){
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    emailInput.classList.remove('invalid');
+    passInput.classList.remove('invalid');
+    emailError.textContent = '';
+    passError.textContent = '';
+    banner.classList.remove('show');
+
+    let hasError = false;
+    if (!validEmail(emailInput.value.trim())) {
+      emailInput.classList.add('invalid');
+      emailError.textContent = 'Enter a valid email address.';
+      hasError = true;
+    }
+    if (passInput.value.length < 6) {
+      passInput.classList.add('invalid');
+      passError.textContent = 'Password must be at least 6 characters.';
+      hasError = true;
+    }
+    if (hasError) return;
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Signing in...';
+
+    try {
+      // TODO: replace with your real auth call
+      await new Promise(r => setTimeout(r, 900));
+      console.log('Login submitted:', { email: emailInput.value.trim() });
+      alert('Wire this up to your backend — form data logged to console.');
+    } catch (err) {
+      banner.classList.add('show');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Sign in';
+    }
+  });
+</script>
+</body>
+</html>
